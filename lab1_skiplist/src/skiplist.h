@@ -14,8 +14,6 @@
 
 #include <atomic>
 
-#define RAND_MAX = 1
-
 typedef std::chrono::high_resolution_clock Clock;
 
 // Key is an 8-byte integer
@@ -67,16 +65,25 @@ template<typename Key>
 int SkipList<Key>::RandomLevel() {
     // To be implemented by students
     // 50%확률로 증가, max 초과 X
+    float rand_probability = 0.0;
+    int level = 1;
     srand(time(0));
-    //float r = 
-
-    return 1; // Default return value (students should modify this)
+    while (level <= max_level){
+        rand_probability = (float)rand() / RAND_MAX;
+        if (rand_probability > probability) {
+            level++;
+        } else{
+            break;
+        }
+    }
+    return level; // Default return value (students should modify this)
 }
 
 // Constructor for SkipList
 template<typename Key>
 SkipList<Key>::SkipList(int max_level, float probability)
     : max_level(max_level), probability(probability) {
+        
     // To be implemented by students
 }
 
