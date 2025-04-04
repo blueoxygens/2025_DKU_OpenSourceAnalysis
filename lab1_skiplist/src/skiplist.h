@@ -62,20 +62,11 @@ struct SkipList<Key>::Node {
 // Generate a random level for new nodes
 template<typename Key>
 int SkipList<Key>::RandomLevel() {
-    // To be implemented by students
-    // 50%확률로 증가, max 초과 X
-    float rand_probability = 0.0;
     int level = 1;
-    srand(time(0));
-    while (level <= max_level){
-        rand_probability = (float)rand() / RAND_MAX;
-        if (rand_probability > probability) {
-            level++;
-        } else{
-            break;
-        }
+    while ((float)rand() / RAND_MAX < probability && level < max_level) {
+        level++;
     }
-    return level; // Default return value (students should modify this)
+    return level;
 }
 
 // Constructor for SkipList
