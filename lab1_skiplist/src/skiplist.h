@@ -11,7 +11,6 @@
 #include <functional>
 #include <mutex>
 #include <vector>
-
 #include <atomic>
 
 typedef std::chrono::high_resolution_clock Clock;
@@ -83,27 +82,84 @@ int SkipList<Key>::RandomLevel() {
 template<typename Key>
 SkipList<Key>::SkipList(int max_level, float probability)
     : max_level(max_level), probability(probability) {
-        
+        head = new Node(0, max_level);
+        head->next = std::vector<Node*>(max_level, nullptr);
     // To be implemented by students
 }
 
 // Insert function (inserts a key into SkipList)
 template<typename Key>
 void SkipList<Key>::Insert(const Key& key) {
+    Node* current = head;
+    std::vector<Node*> updates(max_level);
+    for(int i = max_level-1; i>=0; i--){
+        while(current->next[i] != nullptr && current->next[i]->key < key){
+            current = current->next[i];
+        }
+        updates[i] = current;
+    }
+
+    int new_level = RandomLevel();
+    Node* new_node = new Node(key, new_level);
+
+    for (int i = 0; i < new_level; ++i) {
+        if (updates[i]->next[i] != nullptr) {
+            new_node->next[i] = updates[i]->next[i];
+        } else {
+            new_node->next[i] = nullptr;
+        }
+        updates[i]->next[i] = new_node;
+    }
     // To be implemented by students
 }
 
 // Delete function (removes a key from SkipList)
 template<typename Key>
 bool SkipList<Key>::Delete(const Key& key) const {
-    // To be implemented by students
-    return false;
+Node* current = head;
+    std::vector<Node*> updates(max_level);
+
+    //레벨을 따라 진행하며 찾아가는 과정
+    for (int i = max_level - 1; i >= 0; i--) {
+        while (current->next[i] != nullptr && current->next[i]->key < key) {
+            current = current->next[i];
+        }
+        updates[i] = current;
+    }
+
+    current = current->next[0];
+    if (current == nullptr || current->key != key) {
+        return false;  // 키가 존재하지 않을 시
+    }
+
+    //전체 레벨에 있는 노드들을 삭제한다
+    for (int i = 0; i < max_level; i++) {
+        if (updates[i]->next[i] == current) {
+            updates[i]->next[i] = current->next[i];
+        }
+        //상위 레벨이 없을 시 올라가지 않는다.
+        if (updates[i]->next[i] == nullptr) break;
+    }
+    delete current;
+    return true;
 }
 
 // Lookup function (checks if a key exists in SkipList)
 template<typename Key>
 bool SkipList<Key>::Contains(const Key& key) const {
     // To be implemented by students
+        Node* current = head;
+
+    //레벨을 따라 진행하며 찾아가는 과정
+    for (int i = max_level - 1; i >= 0; i--) {
+        while (current->next[i] != nullptr && current->next[i]->key < key) {
+            current = current->next[i];
+        }
+    }
+    current = current->next[0];
+    if(current != nullptr && current->key == key){
+        return true;
+    }
     return false;
 }
 
@@ -111,7 +167,26 @@ bool SkipList<Key>::Contains(const Key& key) const {
 template<typename Key>
 std::vector<Key> SkipList<Key>::Scan(const Key& key, const int scan_num) {
     // To be implemented by students
-    return {};
+    std::vector<Key> result;
+    Node* current = head;
+
+    // 키와 동일한 노드를 찾아 순회
+    for (int i = max_level - 1; i >= 0; i--) {
+        while (current->next[i] != nullptr && current->next[i]->key < key) {
+            current = current->next[i];
+        }
+    }
+    current = current->next[0];
+
+    while (current != nullptr && result.size() < scan_num) {
+        result.push_back(current->key);
+        current = current->next[0];
+    }
+
+    return result;
+}
+template<typename Key>
+SkipList<Key>::Node::Node(Key key, int level): key(key), next(level){
 }
 
 template<typename Key>
