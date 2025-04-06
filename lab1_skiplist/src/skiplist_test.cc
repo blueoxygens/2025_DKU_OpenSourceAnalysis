@@ -231,6 +231,7 @@ void printUsage(const char* programName) {
 }
 
 int main(int argc, char *argv[]) {
+    srand(time(NULL)); // rabd함수 seed 설정
     if (argc != 4) {
         printUsage(argv[0]);
         return 1;
