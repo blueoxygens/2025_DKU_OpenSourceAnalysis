@@ -34,7 +34,7 @@ class SkipList {
     struct Node;
 
    public:
-    SkipList(int max_level = 16, float probability = 0.5);
+    SkipList(int max_level = 16, float probability = 0.85);
 
     void Insert(const Key& key); // Insertion function (to be implemented by students)
     bool Contains(const Key& key) const; // Lookup function (to be implemented by students)
