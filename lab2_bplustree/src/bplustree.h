@@ -355,15 +355,15 @@ bool Bplustree<Key>::DeleteInternal(Node* current, const Key& key) {
     }
 
     InternalNode* internal_node = current->as_internal();
-    auto it = std::lower_bound(internal_node->keys.begin(), internal_node->keys.end(), key);
+    auto itr = std::lower_bound(internal_node->keys.begin(), internal_node->keys.end(), key);
 
     // 삭제하려는 키가 내부 노드에 없으면 리턴
-    if (it == internal_node->keys.end() || *it != key) {
+    if (itr == internal_node->keys.end() || *itr != key) {
         return false;
     }
 
     // 삭제할 키 찾은 후 해당 자식 노드로 내려가기
-    int index = std::distance(internal_node->keys.begin(), it);
+    int index = std::distance(internal_node->keys.begin(), itr);
     Node* child = internal_node->children[index];
 
     // 1. 자식 노드가 리프 노드인 경우, 자식에서 키 삭제
@@ -438,8 +438,8 @@ typename Bplustree<Key>::LeafNode* Bplustree<Key>::FindLeaf(const Key& key) cons
 
     while (!current->is_leaf) {
         InternalNode* internal = current->as_internal();
-        auto it = std::upper_bound(internal->keys.begin(), internal->keys.end(), key);
-        int idx = it - internal->keys.begin();
+        auto itr = std::upper_bound(internal->keys.begin(), internal->keys.end(), key);
+        int idx = itr - internal->keys.begin();
         current = internal->children[idx];
     }
 
